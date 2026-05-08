@@ -8,10 +8,12 @@
 # without any tutorial-specific runtime work.
 #
 # Plan 2 will replace this with the real flow:
-#   - download Flux.1 model weights from HuggingFace (with retries)
+#   - download Flux.1 schnell fp8 weights from our Yandex Object Storage mirror
+#     (single ~17 GB all-in-one checkpoint, aria2c with retries and integrity check)
 #   - place workflow.json into ComfyUI's user/default/workflows directory
-#   - install pinned custom nodes
-#   - signal "ready" to the customer app via the cc-agent metrics endpoint
+#   - install pinned custom nodes from manifest.yaml's comfyui.custom_nodes
+#   - signal "ready" to the customer app by writing /var/log/cc-provision/state.json,
+#     which the on-instance monitoring agent forwards to app.cloudcompute.ru
 #
 set -euo pipefail
 echo "[cc-tutorial] comfyui-flux provision: noop (plan 1 placeholder)"

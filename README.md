@@ -1,24 +1,25 @@
-# Flux.1 in ComfyUI — one-click on cloudcompute.ru
+# Flux.1 в ComfyUI — запуск в один клик на cloudcompute.ru
 
-Runtime payload for the **Flux.1 in ComfyUI** tutorial on
+Runtime-составляющая туториала **«Flux.1 в ComfyUI»** на
 [cloudcompute.ru/tutorials/comfyui-flux](https://cloudcompute.ru/tutorials/comfyui-flux).
 
-This repo holds everything that runs on the GPU instance when a user clicks the
-"Запустить" button on the tutorial article: the manifest the customer app reads
-to pick a matching offer, the provision script that downloads weights and
-installs custom nodes, and the ComfyUI workflow file the user sees when the app
-loads.
+В этом репозитории лежит всё, что выполняется на облачной видеокарте, когда
+пользователь нажимает «Запустить» в статье туториала: `manifest.yaml`, который
+читают маркетинговый сайт и customer app, скрипт `provision.sh`, скачивающий
+веса и устанавливающий custom nodes, и `workflow.json`, который ComfyUI
+открывает по умолчанию.
 
-## Run on cloudcompute.ru (recommended)
+## Запустить на cloudcompute.ru (рекомендуем)
 
 [cloudcompute.ru/tutorials/comfyui-flux](https://cloudcompute.ru/tutorials/comfyui-flux)
-— click "Запустить" and you're in ComfyUI with the workflow loaded in roughly
-five minutes. No local install, no 24 GB download.
+— нажмите «Запустить», и через несколько минут вы окажетесь в ComfyUI с уже
+загруженным workflow. Без локальной установки, без 17 ГБ загрузки на свой диск.
 
-## Run it yourself
+## Запустить у себя
 
-Flux.1 needs ~16-24 GB of VRAM. If you have a 3090, 4090, A6000, or comparable
-card, you can run this locally:
+Мы используем вариант **Flux.1 schnell в FP8** (Comfy-Org all-in-one) — ему
+достаточно около 12 ГБ видеопамяти. Если у вас RTX 3090, 4090, A6000 или
+сопоставимая карта — запустите локально:
 
 ```bash
 git clone https://github.com/cloudcompute-ru/comfyui-flux.git
@@ -26,19 +27,20 @@ cd comfyui-flux
 bash provision.sh
 ```
 
-`provision.sh` will be filled out in the next iteration of this repo. For now
-it is a no-op placeholder (see `provision.sh`).
+`provision.sh` будет дополнен в следующей итерации репозитория — сейчас это
+заглушка (см. `provision.sh`).
 
-## What's in here
+## Что внутри
 
-- `manifest.yaml` - declarative metadata read by both the marketing site and
-  the customer app at request time.
-- `article.ru.md` - the article body rendered at the live tutorial URL.
-- `provision.sh` - runs on the GPU instance at boot.
-- `workflow.json` - the ComfyUI workflow loaded by default.
-- `screenshots/` - example outputs and UI shots used by the article.
+- `manifest.yaml` — декларативные метаданные, которые маркетинговый сайт и
+  customer app читают по требованию.
+- `article.ru.md` — текст статьи, отрендеренный по адресу туториала.
+- `provision.sh` — выполняется на облачной видеокарте при старте.
+- `workflow.json` — ComfyUI workflow, загружаемый по умолчанию.
+- `screenshots/` — примеры результатов и скриншоты интерфейса для статьи.
 
-## License
+## Лицензии
 
-MIT for the wrapper scripts and configuration. The Flux.1 model weights are
-distributed under their own license - see the upstream HuggingFace repository.
+Скрипты и конфигурация — MIT. Модель Flux.1 schnell распространяется под
+**Apache License 2.0** — её авторы (Black Forest Labs) разрешают свободное
+коммерческое использование. Подробности — в upstream-репозитории на HuggingFace.

@@ -4,12 +4,14 @@ subtitle: "Запустите Flux.1 на облачной видеокарте 
 sort_order: 10
 
 # Customer app uses these to pick a matching Vast.ai offer at launch time.
+# v1 ships the fp8 (Comfy-Org all-in-one) checkpoint, which fits comfortably in 12 GB.
 template_slug: comfyui
-min_vram_gb: 16
+min_vram_gb: 12
 recommended_gpus:
   - rtx-4090
   - rtx-3090
   - rtx-a6000
+  - rtx-4070-ti
 
 # Hint to the recommended top-up calculator and the article copy.
 expected_session_minutes: 60

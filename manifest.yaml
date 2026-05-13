@@ -16,11 +16,34 @@ recommended_gpus:
 # Hint to the recommended top-up calculator and the article copy.
 expected_session_minutes: 60
 
-# Plan 2 will read this; plan 1 ignores it.
+# Provisioning stages reported by provision.sh via /api/agent/provision.
+# script_sha pins the exact provision.sh revision the onstart wrapper
+# fetches at boot — bump it after merging changes to provision.sh.
+# `main` is a fallback the customer app uses when this is unset; in
+# production we always pin to a SHA so two concurrent rollouts can't
+# disagree about what got provisioned.
+provisioning:
+  script_sha: "main"
+  stages:
+    - id: install_comfyui
+      label_ru: "Устанавливаем ComfyUI"
+      estimated_seconds: 60
+    - id: download_model
+      label_ru: "Скачиваем Flux schnell (~17 ГБ)"
+      estimated_seconds: 300
+      with_progress: true
+    - id: start_server
+      label_ru: "Запускаем ComfyUI"
+      estimated_seconds: 10
+
 entrypoint:
   type: web_ui
   port: 8188
   cta_label_ru: "Открыть ComfyUI"
+  ready_check:
+    type: http
+    path: /
+    timeout_seconds: 600
 
 seo:
   description: "Полный гайд по запуску Flux.1 в ComfyUI на облачном GPU. Готовый workflow, без локальной установки."

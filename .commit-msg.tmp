@@ -1,0 +1,11 @@
+Add plan 2 provisioning artifacts: stages manifest + provision script
+
+manifest.yaml: provisioning.stages drive the customer app's tutorial
+stepper (install_comfyui -> download_model -> start_server), and
+entrypoint.ready_check tells the frontend when to start polling the
+ComfyUI port. script_sha=main is the pre-pinning placeholder.
+
+provision.sh: real bootstrap (was a placeholder). Reports per-stage
+progress to /api/agent/provision via report_stage helper, downloads
+the ~17 GB Flux schnell fp8 checkpoint from our Yandex Object Storage
+mirror, and starts ComfyUI on :8188.

@@ -39,11 +39,21 @@ provisioning:
 entrypoint:
   type: web_ui
   port: 8188
+  # ComfyUI's HTTP server speaks plain HTTP, no TLS. The customer app uses
+  # this scheme verbatim to build both the open-button URL and (formerly)
+  # the browser ready-check URL. Default in the frontend is `https` to keep
+  # legacy tutorials working; declare `http` explicitly here.
+  scheme: http
   cta_label_ru: "Открыть ComfyUI"
   ready_check:
-    type: http
-    path: /
-    timeout_seconds: 600
+    # `provision_marker` tells the frontend to trust provision.sh's own
+    # wait-for-port loop as the ready signal — the customer-app browser
+    # can't do a cross-origin http poll from its https page (mixed-content
+    # block), and provision.sh already curls localhost:8188 before
+    # reporting `start_server` complete. Other tutorials whose entrypoint
+    # *does* have TLS (e.g. anything Vast-Jupyter-shaped) should keep
+    # `type: http` and let the browser poll.
+    type: provision_marker
 
 seo:
   description: "Полный гайд по запуску Flux.1 в ComfyUI на облачном GPU. Готовый workflow, без локальной установки."

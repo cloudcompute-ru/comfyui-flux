@@ -155,11 +155,35 @@ report_stage '{"stage":"start_server"}'
 cd "$COMFYUI_DIR"
 nohup python3 main.py --listen 0.0.0.0 --port "$COMFYUI_PORT" \
     > /var/log/comfyui.log 2>&1 &
+COMFYUI_PID=$!
 
-# Give it a moment to bind the port; the frontend's HTTP poll handles the
-# real "is it accepting requests" check, so a sleep here is mostly for the
-# stage timing UI.
-sleep 5
+# Wait for ComfyUI to actually bind the port before we report start_server
+# done. We previously slept 5 seconds and reported success unconditionally —
+# but if main.py crashes during import (driver/CUDA mismatch, missing dep,
+# OOM), the user is left staring at a "preparing interface" spinner forever
+# because the frontend never gets a failure signal. With the wait loop the
+# frontend either gets a real `start_server` success or a stage with a
+# `message` field it can surface as an error.
+COMFYUI_BIND_TIMEOUT_S=90
+for _ in $(seq 1 "$COMFYUI_BIND_TIMEOUT_S"); do
+    if curl -fsS --max-time 1 "http://127.0.0.1:${COMFYUI_PORT}/" >/dev/null 2>&1; then
+        report_stage "{\"stage\":\"start_server\",\"progress_pct\":100}"
+        log "provisioning complete"
+        exit 0
+    fi
+    # Bail early if python already died — no point waiting the full timeout.
+    if ! kill -0 "$COMFYUI_PID" 2>/dev/null; then
+        log "comfyui process exited before binding port ${COMFYUI_PORT}"
+        # Surface the last few lines of the crash to the UI. report_stage's
+        # JSON body cap is generous (~5s curl timeout) but messages still
+        # have to fit in one POST, so truncate to 500 chars.
+        tail_msg="$(tail -c 500 /var/log/comfyui.log 2>/dev/null | tr -d '\r' | tr '\n' ' ' | sed 's/"/'"'"'/g')"
+        report_stage "{\"stage\":\"start_server\",\"message\":\"ComfyUI crashed during startup: ${tail_msg}\"}"
+        exit 1
+    fi
+    sleep 1
+done
 
-report_stage "{\"stage\":\"start_server\",\"progress_pct\":100}"
-log "provisioning complete"
+log "comfyui did not bind port ${COMFYUI_PORT} within ${COMFYUI_BIND_TIMEOUT_S}s"
+report_stage "{\"stage\":\"start_server\",\"message\":\"ComfyUI did not become ready in ${COMFYUI_BIND_TIMEOUT_S}s. See /var/log/comfyui.log on the instance.\"}"
+exit 1

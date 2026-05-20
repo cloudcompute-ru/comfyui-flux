@@ -88,6 +88,16 @@ fi
 cd "$COMFYUI_DIR"
 pip install --no-cache-dir -r requirements.txt
 
+# ComfyUI Manager: in-UI installer for custom nodes and missing models.
+# Without this preinstalled, the first workflow a user opens that needs a
+# custom node hits them with a cryptic "first run `pip install ... comfyui-
+# manager` then restart with --enable-manager" wall — which is impossible
+# for a tutorial user because they don't have terminal access to the
+# container by default. Install + enable up-front so the in-UI manager is
+# always available. --pre matches ComfyUI's own install instructions (the
+# pip distribution is currently a pre-release).
+pip install --no-cache-dir -U --pre comfyui-manager
+
 mkdir -p "$MODEL_DIR" "$WORKFLOW_DIR"
 
 # --- stage 2: download_model ---------------------------------------------
@@ -153,7 +163,11 @@ log "stage: start_server"
 report_stage '{"stage":"start_server"}'
 
 cd "$COMFYUI_DIR"
-nohup python3 main.py --listen 0.0.0.0 --port "$COMFYUI_PORT" \
+# --enable-manager: activates the ComfyUI Manager pip package installed
+# during install_comfyui. Without this flag the manager is dormant and
+# the in-UI "install missing nodes" button won't appear, defeating the
+# point of preinstalling it.
+nohup python3 main.py --listen 0.0.0.0 --port "$COMFYUI_PORT" --enable-manager \
     > /var/log/comfyui.log 2>&1 &
 COMFYUI_PID=$!
 

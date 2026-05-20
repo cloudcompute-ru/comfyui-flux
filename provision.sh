@@ -29,10 +29,26 @@ MODEL_FILE="${MODEL_DIR}/flux1-schnell-fp8.safetensors"
 WORKFLOW_DIR="${COMFYUI_DIR}/user/default/workflows"
 COMFYUI_PORT="${COMFYUI_PORT:-8188}"
 
-# Default to our public Yandex Object Storage mirror; can be overridden
-# (e.g. for a beta build pulling from a staging bucket) by exporting
-# YANDEX_MIRROR_URL before invoking the script.
-YANDEX_MIRROR_URL="${YANDEX_MIRROR_URL:-https://storage.yandexcloud.net/cloudcompute/tutorials/comfyui-flux/flux1-schnell-fp8.safetensors}"
+# Where to fetch heavy assets (model weights) from.
+#
+# Resolution order, highest precedence first:
+#   1. YANDEX_MIRROR_URL  — explicit full URL override (set this for ad-hoc
+#                            testing against a staging file or a HuggingFace
+#                            mirror; wins outright when set)
+#   2. CC_TUTORIAL_MIRROR_URL — base URL of the customer app's configured
+#                            tutorials_mirror S3 bucket, exported by the
+#                            onstart wrapper. This is the production path:
+#                            the customer app always knows the correct
+#                            bucket because it generates URLs from the same
+#                            Storage::disk('tutorials_mirror') config used
+#                            elsewhere, so bucket renames can't break us.
+#   3. Hardcoded base URL — last-resort fallback for the local-test case
+#                            of running `bash provision.sh` inside a fresh
+#                            container with no customer-app env at all.
+#                            Must point at a real, currently-correct bucket
+#                            so manual tests succeed without env setup.
+CC_TUTORIAL_MIRROR_URL="${CC_TUTORIAL_MIRROR_URL:-https://storage.yandexcloud.net/cc-tutorials}"
+YANDEX_MIRROR_URL="${YANDEX_MIRROR_URL:-${CC_TUTORIAL_MIRROR_URL%/}/tutorials/comfyui-flux/flux1-schnell-fp8.safetensors}"
 
 # --- helpers --------------------------------------------------------------
 

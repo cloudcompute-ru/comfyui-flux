@@ -1,25 +1,14 @@
-# Flux.1 в ComfyUI — запуск в один клик на cloudcompute.ru
+# ComfyUI с Flux.1 schnell
 
-Runtime-составляющая туториала **«Flux.1 в ComfyUI»** на
-[cloudcompute.ru/tutorials/comfyui-flux](https://cloudcompute.ru/tutorials/comfyui-flux).
+Готовый launcher для **[ComfyUI](https://github.com/comfyanonymous/ComfyUI)** с предустановленной моделью **[Flux.1 schnell (FP8)](https://huggingface.co/black-forest-labs/FLUX.1-schnell)** и стартовым workflow. Поднимает ComfyUI на `0.0.0.0:8188` на свежем NVIDIA-контейнере одной командой — без ручной охоты за весами и возни с custom nodes.
 
-В этом репозитории лежит всё, что выполняется на облачной видеокарте, когда
-пользователь нажимает «Запустить» в статье туториала: `manifest.yaml`, который
-читают маркетинговый сайт и customer app, скрипт `provision.sh`, скачивающий
-веса и устанавливающий custom nodes, и `workflow.json`, который ComfyUI
-открывает по умолчанию.
+Подходит для генерации изображений по текстовому промпту на собственной (или арендованной) видеокарте, в том числе для тех, кто впервые знакомится с ComfyUI и не хочет тратить вечер на сборку окружения.
 
-## Запустить на cloudcompute.ru (рекомендуем)
+## Что нужно
 
-[cloudcompute.ru/tutorials/comfyui-flux](https://cloudcompute.ru/tutorials/comfyui-flux)
-— нажмите «Запустить», и через несколько минут вы окажетесь в ComfyUI с уже
-загруженным workflow. Без локальной установки, без 17 ГБ загрузки на свой диск.
+Linux с одной NVIDIA GPU от **12 ГБ VRAM** (RTX 3090, RTX 4070 Ti, RTX 4090, A6000, A100, H100 — все подходят) и актуальный CUDA-драйвер. Flux.1 schnell в FP8 умещается в 12 ГБ и генерирует изображение за 4 шага сэмплинга.
 
-## Запустить у себя
-
-Мы используем вариант **Flux.1 schnell в FP8** (Comfy-Org all-in-one) — ему
-достаточно около 12 ГБ видеопамяти. Если у вас RTX 3090, 4090, A6000 или
-сопоставимая карта — запустите локально:
+## Запуск
 
 ```bash
 git clone https://github.com/cloudcompute-ru/comfyui-flux.git
@@ -27,20 +16,21 @@ cd comfyui-flux
 bash provision.sh
 ```
 
-`provision.sh` будет дополнен в следующей итерации репозитория — сейчас это
-заглушка (см. `provision.sh`).
+После сообщения `provisioning complete` откройте `http://<host>:8188/` в браузере. Стартовый workflow загружается автоматически — впишите промпт в зелёную ноду **CLIP Text Encode** и нажмите **Queue Prompt**.
+
+`provision.sh` идемпотентен: если веса модели уже скачаны, повторный запуск пропускает этот шаг.
 
 ## Что внутри
 
-- `manifest.yaml` — декларативные метаданные, которые маркетинговый сайт и
-  customer app читают по требованию.
-- `article.ru.md` — текст статьи, отрендеренный по адресу туториала.
-- `provision.sh` — выполняется на облачной видеокарте при старте.
+- `provision.sh` — ставит ComfyUI + ComfyUI Manager, скачивает FP8-чекпоинт Flux.1 schnell, поднимает сервер на `0.0.0.0:8188`.
 - `workflow.json` — ComfyUI workflow, загружаемый по умолчанию.
-- `screenshots/` — примеры результатов и скриншоты интерфейса для статьи.
+- `manifest.yaml` — декларативные метаданные о GPU-требованиях и стадиях провижининга. Используется one-click лаунчером на cloudcompute.ru (см. ниже); для локального запуска не нужен.
+- `screenshots/` — примеры результатов и скриншоты интерфейса.
+
+## Про cloudcompute.ru
+
+Этот репозиторий поддерживает [cloudcompute.ru](https://cloudcompute.ru) — российский GPU-хостинг с почасовой оплатой. Если не хочется самостоятельно арендовать видеокарту и поднимать контейнер, [cloudcompute.ru/tutorials/comfyui-flux](https://cloudcompute.ru/tutorials/comfyui-flux) — это тот же скрипт, запущенный в один клик: подбор подходящей видеокарты от Vast.ai, оплата по факту работы (от ~40 ₽/час), готовый ComfyUI в браузере через 5 минут. Без локальной установки и без 17 ГБ загрузки на свой диск.
 
 ## Лицензии
 
-Скрипты и конфигурация — MIT. Модель Flux.1 schnell распространяется под
-**Apache License 2.0** — её авторы (Black Forest Labs) разрешают свободное
-коммерческое использование. Подробности — в upstream-репозитории на HuggingFace.
+Скрипты и конфигурация — MIT (см. `LICENSE`). Модель Flux.1 schnell распространяется под **Apache License 2.0** (Black Forest Labs) — коммерческое использование разрешено. ComfyUI — GPL-3.0, ComfyUI Manager — GPL-3.0. Этот репозиторий устанавливает их в runtime, но не модифицирует и не перераспространяет.

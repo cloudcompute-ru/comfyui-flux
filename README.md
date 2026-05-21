@@ -24,7 +24,6 @@ bash provision.sh
 
 - `provision.sh` — ставит ComfyUI + ComfyUI Manager, скачивает FP8-чекпоинт Flux.1 schnell, поднимает сервер на `0.0.0.0:8188`.
 - `workflow.json` — ComfyUI workflow, загружаемый по умолчанию.
-- `manifest.yaml` — декларативные метаданные о GPU-требованиях и стадиях провижининга. Используется one-click лаунчером на cloudcompute.ru (см. ниже); для локального запуска не нужен.
 - `screenshots/` — примеры результатов и скриншоты интерфейса.
 
 ## Про cloudcompute.ru
